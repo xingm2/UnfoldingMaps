@@ -20,7 +20,7 @@ import processing.core.PApplet;
 /** EarthquakeCityMap
  * An application with an interactive map displaying earthquake data.
  * Author: UC San Diego Intermediate Software Development MOOC team
- * @author Your name here
+ * @author Menglong Xing
  * Date: July 17, 2015
  * */
 public class EarthquakeCityMap extends PApplet {
@@ -76,11 +76,11 @@ public class EarthquakeCityMap extends PApplet {
 		
 		// FOR TESTING: Set earthquakesURL to be one of the testing files by uncommenting
 		// one of the lines below.  This will work whether you are online or offline
-		//earthquakesURL = "test1.atom";
+		earthquakesURL = "test1.atom";
 		//earthquakesURL = "test2.atom";
 		
 		// WHEN TAKING THIS QUIZ: Uncomment the next line
-		earthquakesURL = "quiz1.atom";
+		//earthquakesURL = "quiz1.atom";
 		
 		
 		// (2) Reading in earthquake data and geometric properties
@@ -132,26 +132,66 @@ public class EarthquakeCityMap extends PApplet {
 	// helper method to draw key in GUI
 	// TODO: Update this method as appropriate
 	private void addKey() {	
+		//The size of triangle legend
+		int TRI_SIZE = 3;
+
 		// Remember you can use Processing's graphics methods here
+		// Background
 		fill(255, 250, 240);
 		rect(25, 50, 150, 250);
 		
+		// Title
 		fill(0);
 		textAlign(LEFT, CENTER);
 		textSize(12);
 		text("Earthquake Key", 50, 75);
 		
+		// City/Land/Ocean Legend Symbol
 		fill(color(255, 0, 0));
-		ellipse(50, 125, 15, 15);
-		fill(color(255, 255, 0));
-		ellipse(50, 175, 10, 10);
-		fill(color(0, 0, 255));
-		ellipse(50, 225, 5, 5);
-		
+		triangle(50-(float)sqrt(3*TRI_SIZE*TRI_SIZE),100+TRI_SIZE,50,100-(float)2*TRI_SIZE,50+(float)sqrt(3*TRI_SIZE*TRI_SIZE),100+TRI_SIZE );
+		//fill(color(255, 255, 0));
+		fill(color(255, 255, 255));
+	    ellipse(50, 125, 10, 10);
+		//ellipse(50, 125, 15, 15);
+		//fill(color(0, 0, 255));
+		rect(46,150, 10, 10);
+		//ellipse(50, 225, 5, 5);
+	    
+	    // Legend Text	
 		fill(0, 0, 0);
-		text("City Marker", 75, 125);
-		text("Land Quake", 75, 175);
-		text("Ocean Quake", 75, 225);
+		text("City Marker", 75, 100);
+		text("Land Quake", 75, 125);
+		text("Ocean Quake", 75, 150);
+		
+		text("Size ~ Magnitude", 50, 175);
+
+		text("Shallow", 75, 200);
+		text("Intermediate", 75, 225);
+		text("Deep", 75, 250);
+
+        // Depth Legend Symbol
+		fill(color(255, 255, 0));
+	    ellipse(50, 200, 10, 10);
+             
+		fill(color(0, 0, 255));
+	    ellipse(50, 225, 10, 10);
+
+		fill(color(255, 0, 0));
+	    ellipse(50, 250, 10, 10);
+
+        // Time Range Legend 
+		// text
+		fill(color(0, 0, 0));
+        text("Past Day", 75, 275);
+		// symbol bottom
+		fill(color(255, 255, 255));
+		int x = 50;
+		int y = 275;
+	    ellipse(x, y, 10, 10);
+        // symbol top
+		strokeWeight(2);
+		line(x-8, y-8, x+8, y+8);
+		line(x-8, y+8, x+8, y-8);
 	}
 
 	
@@ -167,7 +207,8 @@ public class EarthquakeCityMap extends PApplet {
 		// For each, check if the earthquake PointFeature is in the 
 		// country in m.  Notice that isInCountry takes a PointFeature
 		// and a Marker as input.  
-		// If isInCountry ever returns true, isLand should return true.
+		// NOTE: If isInCountry ever returns true, isLand should return true.
+		// NOTE: If this earthquake is in any country, it's on land, otherwise, it in sea.
 		for (Marker m : countryMarkers) {
 			// TODO: Finish this method using the helper method isInCountry
 		    if (isInCountry(earthquake, m)){
@@ -200,21 +241,30 @@ public class EarthquakeCityMap extends PApplet {
 		//      the name property of the country marker.   If so, increment
 		//      the country's counter.
 		for (Marker cm : countryMarkers) {
+			// earthquakes that happened in this country.
             int eq_number = 0;
             for ( Marker qm : quakeMarkers) {
+            	// You know the underlying object is an EarthquakeMarker.
+            	// You can cast it
                 EarthquakeMarker em = (EarthquakeMarker)qm;
+                // Then use the method of the EarthquakeMarker class isOnLand
                 if (em.isOnLand()){
-                    String country_name = cm.getStringProperty("name");
+                    String country_name = (String)cm.getProperty("name");
+                	// Because inOnland() is true,
+                	// qm is pointing to a list of LandQuakeMarker, it has a "country" property set 
                     String country_eq   = (String)qm.getProperty("country");
                     if( country_eq.equals(country_name)){
                         eq_number++;
                     }
                 }
             }
+            // NOTE: this is still within countryMarkers loop
             if (eq_number > 0) {
                 System.out.println(cm.getStringProperty("name") + ": " + eq_number);
             }
         }
+
+        // earthquakes happened in the ocean
         int oq_number = 0;
         for (Marker qm : quakeMarkers){
             EarthquakeMarker em2 = (EarthquakeMarker)qm;

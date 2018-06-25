@@ -10,14 +10,14 @@ import static java.lang.Math.sqrt;
 /** Implements a visual marker for cities on an earthquake map
  * 
  * @author UC San Diego Intermediate Software Development MOOC team
- * @author Your name here
+ * @author Menglong Xing
  *
  */
 public class CityMarker extends SimplePointMarker {
 	
 	// The size of the triangle marker
 	// It's a good idea to use this variable in your draw method
-	public static final int TRI_SIZE = 7;  
+	public static final int TRI_SIZE = 3;  
 	
 	public CityMarker(Location location) {
 		super(location);
@@ -47,7 +47,7 @@ public class CityMarker extends SimplePointMarker {
 		// whose upper left corner is at position x, y
 		// Check out the processing documentation for more methods
 	    pg.fill(255, 0, 0);
-        pg.triangle(x-(float)sqrt(3*TRI_SIZE),y+TRI_SIZE,x,y-TRI_SIZE,x+(float)sqrt(3*TRI_SIZE),y+TRI_SIZE );
+        pg.triangle(x-(float)sqrt(3*TRI_SIZE*TRI_SIZE),y+TRI_SIZE, x,y-(float)(2 * TRI_SIZE), x+(float)sqrt(3*TRI_SIZE*TRI_SIZE),y+TRI_SIZE );
 		
 		// Restore previous drawing style
 		pg.popStyle();

@@ -7,7 +7,7 @@ import processing.core.PGraphics;
 /** Implements a visual marker for earthquakes on an earthquake map
  * 
  * @author UC San Diego Intermediate Software Development MOOC team
- * @author Your name here
+ * @author Menglong Xing
  *
  */
 public abstract class EarthquakeMarker extends SimplePointMarker
@@ -46,12 +46,14 @@ public abstract class EarthquakeMarker extends SimplePointMarker
 	// constructor
 	public EarthquakeMarker (PointFeature feature) 
 	{
+		// super class is SimplePointMarker
 		super(feature.getLocation());
 		// Add a radius property and then set the properties
 		java.util.HashMap<String, Object> properties = feature.getProperties();
 		float magnitude = Float.parseFloat(properties.get("magnitude").toString());
 		properties.put("radius", 2*magnitude );
 		setProperties(properties);
+		// Look at line 21
 		this.radius = 1.75f*getMagnitude();
 	}
 	
@@ -67,8 +69,16 @@ public abstract class EarthquakeMarker extends SimplePointMarker
 		// call abstract method implemented in child class to draw marker shape
 		drawEarthquake(pg, x, y);
 		
-		// OPTIONAL TODO: draw X over marker if within past day		
-		
+		// OPTIONAL TODO: draw X over marker if within past day
+		String age = (String)getStringProperty("age");		
+		if (age.equals("Past Day") || age.equals("Past Hour")){
+			pg.fill(0,0,0);
+			pg.strokeWeight(2);
+			int buffer = 2;
+			pg.line(x-(radius+buffer),y-(radius+buffer),x+(radius+buffer),y+(radius+buffer));
+			pg.line(x-(radius+buffer),y+(radius+buffer),x+(radius+buffer),y-(radius+buffer));
+		}
+
 		// reset to previous styling
 		pg.popStyle();
 		

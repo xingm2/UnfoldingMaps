@@ -52,12 +52,22 @@ public class CityMarker extends CommonMarker {
 	{
 		
 		// TODO: Implement this method
-		String pop = getProperty("population").toString();
-		//String country = getStringProperty("country");
-		//String pop = getStringProperty("population");
-		pg.text(pop,x,y,x+10,y+10);
-		//pg.text(country,x+10,y+10,x+20,y+20);
-		//pg.text(pop,x+20,y+20,x+30,y+30);
+		String name = getCity() + " " + getCountry() + " ";
+		String pop  = "Pop: " + getPopulation() + " Million"; 
+	     	
+		pg.pushStyle();
+	
+	    // Draw a rectangle first
+	    pg.fill(255,255,255);
+	    pg.rectMode(PConstants.CORNER);
+        pg.rect(x, y-TRI_SIZE-39, Math.max(pg.textWidth(name), pg.textWidth(pop)) + 6, 39);
+        // Draw the text
+		pg.fill(0, 0, 0);
+		pg.textAlign(PConstants.LEFT, PConstants.TOP);
+		pg.text(name, x+3, y-TRI_SIZE-33);
+		pg.text(pop,  x+3, y-TRI_SIZE-18);
+		
+		pg.popStyle();
 	}
 	
 	
