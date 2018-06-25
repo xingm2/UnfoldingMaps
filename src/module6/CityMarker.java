@@ -15,6 +15,10 @@ public class CityMarker extends CommonMarker {
 	
 	public static int TRI_SIZE = 5;  // The size of the triangle marker
 	
+    public int count_eq = 0;
+    public float mag_avg = 0;
+    public String quake_with_big_mag = null;
+
 	public CityMarker(Location location) {
 		super(location);
 	}
@@ -46,6 +50,16 @@ public class CityMarker extends CommonMarker {
 		pg.fill(150, 30, 30);
 		pg.triangle(x, y-TRI_SIZE, x-TRI_SIZE, y+TRI_SIZE, x+TRI_SIZE, y+TRI_SIZE);
 		
+        pg.fill(255,250,254);
+		pg.rect(250, 500, 150, 100, 7);
+		pg.fill(0, 0, 0);
+	    pg.text( getCity(), 250 + 20, 500 + 20);
+	    pg.text( count_eq, 250 + 20, 500 + 40);
+	    pg.text( mag_avg, 250 + 20, 500 + 60);
+	    //pg.text( quake_with_big_mag, 250 + 20, 500 + 80);
+	    //pg.text( quake_with_big_mag, 250 + 20, 500 + 80);
+
+
 		// Restore previous drawing style
 		pg.popStyle();
 	}
@@ -66,7 +80,9 @@ public class CityMarker extends CommonMarker {
 		pg.textAlign(PConstants.LEFT, PConstants.TOP);
 		pg.text(name, x+3, y-TRI_SIZE-33);
 		pg.text(pop, x+3, y - TRI_SIZE -18);
-		
+	    
+
+
 		pg.popStyle();
 	}
 	

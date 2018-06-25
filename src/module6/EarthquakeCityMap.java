@@ -83,10 +83,10 @@ public class EarthquakeCityMap extends PApplet {
 		// FOR TESTING: Set earthquakesURL to be one of the testing files by uncommenting
 		// one of the lines below.  This will work whether you are online or offline
 		//earthquakesURL = "test1.atom";
-		//earthquakesURL = "test2.atom";
+		earthquakesURL = "test2.atom";
 		
 		// Uncomment this line to take the quiz
-		earthquakesURL = "quiz2.atom";
+		//earthquakesURL = "quiz2.atom";
 		
 		
 		// (2) Reading in earthquake data and geometric properties
@@ -106,6 +106,9 @@ public class EarthquakeCityMap extends PApplet {
 	    quakeMarkers = new ArrayList<Marker>();
 	    
 	    for(PointFeature feature : earthquakes) {
+
+	      //System.out.println(feature.getProperties());
+		  
 		  //check if LandQuake
 		  if(isLand(feature)) {
 		    quakeMarkers.add(new LandQuakeMarker(feature));
@@ -115,6 +118,7 @@ public class EarthquakeCityMap extends PApplet {
 		    quakeMarkers.add(new OceanQuakeMarker(feature));
 		  }
 	    }
+
 
 	    // could be used for debugging
 	    //printQuakes();
@@ -134,26 +138,57 @@ public class EarthquakeCityMap extends PApplet {
 		background(0);
 		map.draw();
 		addKey();
-		
+
+	}
+
+	@Override
+	public void keyReleased() {
+		if (key == 'h'){
+			displayCertainMarkers("Past Hour");
+		} else if (key == 'd') {
+			displayCertainMarkers("Past Day");
+		} else if (key == 'w') {
+			displayCertainMarkers("Past Week");
+		} else if (key == 'u') {
+			unhideMarkers();
+		}
 	}
 	
+	private void displayCertainMarkers(String timeRange){
+		EarthquakeMarker eqm;
+		for (Marker marker : quakeMarkers){
+			eqm = (EarthquakeMarker)marker;
+		    if (timeRange.equals(eqm.getStringProperty("age"))){
+		    	marker.setHidden(false);
+		    }else{
+		    	marker.setHidden(true);
+		    }
+		}
+	}
 	
 	// TODO: Add the method:
 	// and then call that method from setUp
 	private void sortAndPrint(int numToPrint){
         // list of earthquake markers -> new array
+        // Version I
         List<EarthquakeMarker> earthquakeList = new ArrayList<EarthquakeMarker>();
         EarthquakeMarker eqm;
         for (Marker m : quakeMarkers){
             eqm = (EarthquakeMarker)m;
             earthquakeList.add(eqm);
         }
+        // Version II
+        //EarthquakeMarker earthquakeList[] = new EarthquakeMarker[quakeMarkers.size()];
+     	//earthquakeList = quakeMarkers.toArray(earthquakeList);
+
         // sort the array in reverse order
         Collections.sort(earthquakeList);
+
         // print out the top numToPrint earthquakes.
         int topNumToPrint = (numToPrint >= earthquakeList.size() ? earthquakeList.size() : numToPrint);
         for (int i = 0; i < topNumToPrint; i++){
             System.out.println(earthquakeList.get(i));
+            //System.out.println(earthquakeList[i]);
         }
     }
 	
@@ -223,19 +258,51 @@ public class EarthquakeCityMap extends PApplet {
 		for (Marker marker : cityMarkers) {
 			if (!marker.isHidden() && marker.isInside(map, mouseX, mouseY)) {
 				lastClicked = (CommonMarker)marker;
+				
+			      	
+				
 				// Hide all the other earthquakes and hide
 				for (Marker mhide : cityMarkers) {
 					if (mhide != lastClicked) {
 						mhide.setHidden(true);
 					}
 				}
+
+				List<EarthquakeMarker> nearbyQuakeMarkers = new ArrayList<EarthquakeMarker>();
+				float mag_sum = 0;
+
 				for (Marker mhide : quakeMarkers) {
 					EarthquakeMarker quakeMarker = (EarthquakeMarker)mhide;
 					if (quakeMarker.getDistanceTo(marker.getLocation()) 
 							> quakeMarker.threatCircle()) {
 						quakeMarker.setHidden(true);
 					}
+					else {
+ 						nearbyQuakeMarkers.add(quakeMarker);
+ 						mag_sum += quakeMarker.getMagnitude();
+					}
 				}
+
+ 				for (EarthquakeMarker eqm : nearbyQuakeMarkers) {
+ 					System.out.println(eqm);
+ 				}
+
+				// Display a popup menu off the map which displays a count for the number
+				// of nearby earthquakes,
+				CityMarker thisCity = (CityMarker)marker;
+                thisCity.count_eq = nearbyQuakeMarkers.size();
+				
+				// the average magnitude
+                thisCity.mag_avg  = mag_sum / thisCity.count_eq;
+				
+				// and the nearby earthquake with the biggest magnitude 
+				//Collections.sort(nearbyQuakeMarkers);
+                
+                //thisCity.quake_with_big_mag = nearbyQuakeMarkers.get(0).getTitle(); 
+                //System.out.println(count_eq + "; " + mag_avg + "; " + nearbyQuakeMarkers.get(0).getRadius());
+
+
+
 				return;
 			}
 		}		
@@ -287,7 +354,7 @@ public class EarthquakeCityMap extends PApplet {
 		int xbase = 25;
 		int ybase = 50;
 		
-		rect(xbase, ybase, 150, 250);
+		rect(xbase, ybase, 170, 400);
 		
 		fill(0);
 		textAlign(LEFT, CENTER);
@@ -339,7 +406,15 @@ public class EarthquakeCityMap extends PApplet {
 		strokeWeight(2);
 		line(centerx-8, centery-8, centerx+8, centery+8);
 		line(centerx-8, centery+8, centerx+8, centery-8);
-		
+	
+		fill(0, 0, 0);
+		textSize(10);
+		text("Earthquake Keyboard Control", xbase+25, ybase+250);
+		text("'w': display quakes from past week", xbase, ybase+270);
+		text("'d': display quakes from past day", xbase, ybase+290);
+		text("'h': display quakes from past hour", xbase, ybase+310);
+		text("'u': display every quake", xbase, ybase+330);
+
 		
 	}
 
